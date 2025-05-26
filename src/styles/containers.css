@@ -10,7 +10,8 @@
     display: flex;
     width: 100%;
     border-bottom: 1px solid black;
-    justify-content: space-evenly;
+    justify-content: center;
+    
 }
 
 

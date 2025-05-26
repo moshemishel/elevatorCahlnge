@@ -10,20 +10,22 @@ export abstract class AbstractElevator extends BaseEntity {
     public abstract get queue(): ElevatorQueueInterface;
     public abstract get isOperating(): boolean;
     public abstract set isOperating(val: boolean);
+    
+    // Added method to update position without triggering arrival logic
+    public abstract updatePosition(position: number): void;
 }
 
 export class Elevator extends AbstractElevator {
     static readonly #INITIAL_FLOOR = elevatorConstants.INITIAL_FLOOR;
     static elevatorMovement: ElevatorMovementStrategy = ElevatorMovementManger;
 
- 
     readonly #queue: ElevatorQueue = new ElevatorQueue();
     #currentFloor: number = Elevator.#INITIAL_FLOOR;
     #isOperating: boolean = false;
     
     // Event callbacks - will be set by Building
     public onMoveCallback?: (elevatorId: number, position: number) => void;
-    public onArrivalCallback?: (floorNumber: number) => void;
+    public onArrivalCallback?: (elevatorId: number, floorNumber: number) => void;
     public onEstimateTimeUpdateCallback?: (elevatorId: number) => void;
 
     constructor(id: number) {
@@ -53,12 +55,18 @@ export class Elevator extends AbstractElevator {
         const oldFloor = this.#currentFloor;
         this.#currentFloor = newFloor;
         
-        console.log(`[Elevator ${this.id}] Moving from floor ${oldFloor} to floor ${newFloor}`);
+        console.log(`[Elevator ${this.id}] Arrived at floor ${newFloor} from floor ${oldFloor}`);
         
-        // Trigger move event
-        this.onMoveCallback?.(this.id, newFloor);
+        // Trigger arrival event when actually arriving at a floor
+        this.onArrivalCallback?.(this.id, newFloor);
+    }
+
+    // Method to update position during movement without triggering arrival
+    public updatePosition(position: number) {
+        this.#currentFloor = position;
         
-        this.onArrivalCallback?.(newFloor);        
+        // Trigger move event for every position update
+        this.onMoveCallback?.(this.id, position);
     }
 
     public get elevatorMovement() {
@@ -93,7 +101,7 @@ export class Elevator extends AbstractElevator {
     // Method to set event callbacks (called by Building)
     public setEventCallbacks(
         onMove: (elevatorId: number, position: number) => void,
-        onArrival: (floorNumber: number) => void,
+        onArrival: (elevatorId: number, floorNumber: number) => void,
         onEstimateTimeUpdate: (elevatorId: number) => void
     ) {
         console.log(`[Elevator ${this.id}] Event callbacks registered`);
