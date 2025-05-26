@@ -1,0 +1,76 @@
+.counter-button-container {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    min-width: 5rem;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+
+  .counter-display-row {
+    display: flex;
+    height: 24px;
+    width: 100%;
+  }
+
+  .counter-display {
+    flex: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background-color: #1f2937;
+    color: #10b981;
+    font-family: monospace;
+    font-size: 12px;
+    border-right: 1px solid #4b5563;
+  }
+
+  .counter-buttons {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .counter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    width: 100%;
+    color: white;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 10px;
+  }
+
+  .counter-btn-plus {
+    background-color: #10b981;
+  }
+
+  .counter-btn-plus:hover {
+    background-color: #059669;
+  }
+
+  .counter-btn-minus {
+    background-color: #ef4444;
+    border-top: 1px solid #d1d5db;
+  }
+
+  .counter-btn-minus:hover {
+    background-color: #dc2626;
+  }
+
+  .counter-label {
+    width: 100%;
+    padding: 2px 8px;
+    background-color: #2563eb;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    white-space: nowrap;
+  }

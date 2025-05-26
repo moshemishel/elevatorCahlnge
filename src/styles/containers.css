@@ -1,0 +1,56 @@
+.app-wrapper {
+    display: grid;
+    grid-template-rows: auto 1fr; 
+    min-height: 100vh;
+    border: 1px solid black;
+    gap: 10px;
+}
+
+.controls-bar {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid black;
+    justify-content: space-evenly;
+}
+
+
+.buildings-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 10px;
+    overflow: auto;
+}
+
+.building-wrapper {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+}
+
+.floors-elevators-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    height: 100%; 
+}
+
+.floors-container {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex: 1; 
+}
+
+.elevators-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 5px;
+    height: 100%; 
+    align-items: stretch; 
+}
