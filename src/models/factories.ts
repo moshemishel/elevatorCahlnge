@@ -1,4 +1,5 @@
-import { Building, Elevator, Floor, type ElevatorDispatcher, type Factory } from "./";
+import { Building, Elevator, Floor  } from "./";
+import {ElevatorDispatcher, Factory} from './types'
 
 
 // *Factory Function* that returns a special Elevator class for a Building

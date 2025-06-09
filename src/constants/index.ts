@@ -1,7 +1,10 @@
-// model
+// Shared constants 
+export * from './sharedConstants';
+
+// Model constants
 export { elevatorConstants, buildingConstants } from './modelConstants';
 
-// view
+// View constants
 export { 
     elevatorConstants as elevatorViewConstants,
     buildingConstants as buildingViewConstants,

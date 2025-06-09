@@ -82,8 +82,8 @@ export class BuildingSystemManager {
 
     createMultipleBuildings(
         count: number, 
-        floorsPerBuilding: number = 5, 
-        elevatorsPerBuilding: number = 1
+        floorsPerBuilding: number = buildingViewConstants.DEFAULT_FLOORS_COUNT, 
+        elevatorsPerBuilding: number = elevatorViewConstants.MIN_ELEVATORS
     ): number[] {
         const buildingIds: number[] = [];
         
@@ -107,8 +107,8 @@ export class BuildingSystemManager {
 
     setBuildingCount(
         targetCount: number, 
-        floorsPerBuilding: number = 5, 
-        elevatorsPerBuilding: number = 1
+        floorsPerBuilding: number = buildingViewConstants.DEFAULT_FLOORS_COUNT, 
+        elevatorsPerBuilding: number = elevatorViewConstants.MIN_ELEVATORS
     ): void {
         const currentCount = this.buildings.size;
         

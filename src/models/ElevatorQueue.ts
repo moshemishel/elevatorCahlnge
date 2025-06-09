@@ -1,4 +1,4 @@
-import { ElevatorQueueInterface } from ".";
+import { ElevatorQueueInterface } from "./types";
 
 export class ElevatorQueue implements ElevatorQueueInterface {
     #requests: number[] = [];
