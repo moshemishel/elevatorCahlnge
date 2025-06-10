@@ -49,9 +49,10 @@ export const BuildingComponent = ({ buildingId, manager }: BuildingComponentProp
   const stats = manager.getBuildingStats(buildingId);
   
   return (
-    <div className="building-container">
-      <div className="building-main">
-        <div className="building-section">
+    <div className="building-wrapper">
+      <div className="building-inner-container">
+        
+        <div className="floors-section">
           <div className="floors-container">
             {building.floors.map(floor => (
               <FloorComponent 
@@ -90,6 +91,7 @@ export const BuildingComponent = ({ buildingId, manager }: BuildingComponentProp
             setCount={handleElevatorsChange}
           />
         </div>
+        
       </div>
     </div>
   );

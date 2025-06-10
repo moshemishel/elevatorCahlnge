@@ -2,68 +2,86 @@
     display: grid;
     grid-template-rows: auto 1fr; 
     min-height: 100vh;
-    border: 1px solid black;
-    gap: 10px;
+    gap: 0;
 }
 
+/* Control panel at top */
 .controls-bar {
     display: flex;
     width: 100%;
-    border-bottom: 1px solid black;
     justify-content: center;
-    padding: 10px;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #dee2e6;
 }
 
+/* Buildings container - align buildings at bottom */
 .buildings-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: flex-end;
-    gap: 20px;
-    padding: 20px;
+    justify-content: center;
+    align-items: flex-end; /* Critical for bottom alignment */
+    gap: 30px;
+    padding: 30px 20px;
     overflow: auto;
+    min-height: calc(100vh - 100px);
 }
 
+/* Building wrapper with black border */
 .building-wrapper {
-    flex: 0 1 auto;
-    min-width: 300px;
+    border: 2px solid black;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0; /* No margin to ensure proper alignment */
+}
+
+/* Inner container for floors and elevators side by side */
+.building-inner-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end; /* Align floors and elevators at bottom */
+    gap: 20px;
+}
+
+/* Floors section */
+.floors-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-}
-
-.floors-elevators-wrapper {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    height: 100%; 
-    position: relative;
+    gap: 20px;
 }
 
 .floors-container {
     display: flex;
-    flex-direction: column-reverse;
-    flex-wrap: nowrap;
+    flex-direction: column-reverse; /* Floor 0 at bottom */
     align-items: center;
-    flex: 1; 
+    width: 200px;
+}
+
+/* Elevators section */
+.elevators-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .elevators-container {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     gap: 5px;
-    height: 100%; 
-    align-items: flex-end; 
-    position: relative;
+    align-items: flex-end; /* Elevators start from bottom */
+    height: 100%;
     min-width: 100px;
+    justify-content: center;
 }
 
-.building-controls {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background-color: #f3f4f6;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Ensure counter buttons have consistent height */
+.counter-button-container {
+    height: 80px !important; /* Fixed height for alignment */
+    flex-shrink: 0;
 }

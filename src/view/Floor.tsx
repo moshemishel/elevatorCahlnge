@@ -15,6 +15,11 @@ export const FloorComponent = ({ buildingId, floor, manager }: { buildingId: num
   // Format time display to show only seconds with one decimal
   const displayTime = estimateTime > 0 ? estimateTime.toFixed(1) : null;
 
+  // Debug log
+  if (floor.isCalling && displayTime) {
+    console.log(`[Floor ${floor.id}] Timer display:`, { estimateTime, displayTime });
+  }
+
   return (
     <div className="floor">
       <button

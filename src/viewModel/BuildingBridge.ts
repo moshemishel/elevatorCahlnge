@@ -174,6 +174,14 @@ export class BuildingBridge {
     private handleFloorAdded() {
         const floors = this.buildingModel.floors; 
         const newFloor = floors[floors.length - 1]; 
+
+        // Debug log for estimate time
+        console.log(`[BuildingBridge] Floor added - estimate time:`, {
+            floorId: newFloor.id,
+            estimateTime: newFloor.estimatedWaitTimeSeconds,
+            isNaN: isNaN(newFloor.estimatedWaitTimeSeconds),
+            isUndefined: newFloor.estimatedWaitTimeSeconds === undefined
+        });
         
         this.setStoreState((state: any) => {
             const building = state.buildings[this.buildingId];
@@ -199,6 +207,7 @@ export class BuildingBridge {
         const elevators = this.buildingModel.elevators; 
         const newElevator = elevators[elevators.length - 1]; 
         const pxPos = BuildingBridge.convertLogicalToVisual(newElevator.currentFloor);
+        
         
         this.setStoreState((state: any) => {
             const building = state.buildings[this.buildingId];
@@ -341,51 +350,64 @@ export class BuildingBridge {
         console.log(`[BuildingBridge ${this.buildingId}] Initial sync completed`);
     }
 
-    private startEstimateTimeUpdater() {
-        // Update estimate times every 100ms
-        this.estimateTimeInterval = setInterval(() => {
-            if (!this.eventsEnabled) return;
+private startEstimateTimeUpdater() {
+    // Update estimate times every 100ms
+    this.estimateTimeInterval = setInterval(() => {
+        if (!this.eventsEnabled) return;
+        
+        this.setStoreState((state: any) => {
+            const building = state.buildings[this.buildingId];
+            if (!building) return state;
             
-            this.setStoreState((state: any) => {
-                const building = state.buildings[this.buildingId];
-                if (!building) return state;
-                
-                let hasChanges = false;
-                const updatedFloors = building.floors.map((floor: any) => {
-                    const modelFloor = this.buildingModel.getFloorByNumber(floor.id);
-                    if (!modelFloor || !modelFloor.isCallingToElevator) {
-                        if (floor.estimateTime > 0) {
-                            hasChanges = true;
-                            return { ...floor, estimateTime: 0 };
-                        }
-                        return floor;
-                    }
-                    
-                    const newEstimateTime = Math.max(0, modelFloor.estimatedWaitTimeSeconds);
-                    if (Math.abs(floor.estimateTime - newEstimateTime) > 0.01) {
+            let hasChanges = false;
+            const updatedFloors = building.floors.map((floor: any) => {
+                const modelFloor = this.buildingModel.getFloorByNumber(floor.id);
+                if (!modelFloor || !modelFloor.isCallingToElevator) {
+                    if (floor.estimateTime > 0) {
                         hasChanges = true;
-                        return {
-                            ...floor,
-                            estimateTime: newEstimateTime
-                        };
+                        return { ...floor, estimateTime: 0 };
                     }
                     return floor;
-                });
+                }
                 
-                if (!hasChanges) return state;
+                const newEstimateTime = Math.max(0, modelFloor.estimatedWaitTimeSeconds);
                 
-                return {
-                    buildings: {
-                        ...state.buildings,
-                        [this.buildingId]: {
-                            ...building,
-                            floors: updatedFloors
-                        }
-                    }
-                };
+                // *** התוספת החדשה מתחילה כאן - אחרי שורה 20 ***
+                // Debug log for NaN/undefined
+                if (isNaN(newEstimateTime) || newEstimateTime === undefined) {
+                    console.warn(`[BuildingBridge] Invalid estimate time for floor ${floor.id}:`, {
+                        newEstimateTime,
+                        isNaN: isNaN(newEstimateTime),
+                        isUndefined: newEstimateTime === undefined,
+                        modelValue: modelFloor.estimatedWaitTimeSeconds
+                    });
+                }
+                // *** התוספת החדשה מסתיימת כאן ***
+                
+                if (Math.abs(floor.estimateTime - newEstimateTime) > 0.01) {
+                    hasChanges = true;
+                    return {
+                        ...floor,
+                        estimateTime: newEstimateTime
+                    };
+                }
+                return floor;
             });
-        }, 100);
-    }
+            
+            if (!hasChanges) return state;
+            
+            return {
+                buildings: {
+                    ...state.buildings,
+                    [this.buildingId]: {
+                        ...building,
+                        floors: updatedFloors
+                    }
+                }
+            };
+        });
+    }, 100);
+}
 
     destroy() {
         if (this.estimateTimeInterval !== null) {
