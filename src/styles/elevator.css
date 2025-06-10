@@ -1,4 +1,17 @@
+.elevator-shaft {
+    position: relative;
+    width: 50px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 2px solid #374151;
+    border-radius: 4px;
+}
+
 .elevator {
+    position: absolute;
     width: 45px;
     height: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: bottom 0.1s linear;
+    z-index: 5;
 }

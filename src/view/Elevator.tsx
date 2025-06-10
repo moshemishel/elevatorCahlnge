@@ -1,14 +1,26 @@
 import { useElevatorPosition } from "../viewModel";
 import '../styles/elevator.css';
-export const ElevatorComponent = ({ buildingId, elevatorId }: { buildingId: number; elevatorId: number }) => {
 
+interface ElevatorComponentProps {
+  buildingId: number;
+  elevatorId: number;
+  totalFloors: number;
+}
+
+export const ElevatorComponent = ({ buildingId, elevatorId, totalFloors }: ElevatorComponentProps) => {
   const pxPosition = useElevatorPosition(buildingId, elevatorId);
-  console.log('Position value:', pxPosition, typeof pxPosition);
+  
+  // Calculate the total height of the elevator shaft based on number of floors
+  const shaftHeight = totalFloors * 110; // 110px per floor
+  
   return (
-    <img
-      src="/elv.png"
-      className="elevator"
-      style={{ bottom: `${pxPosition}px`, position: 'absolute' }}
-    />
+    <div className="elevator-shaft" style={{ height: `${shaftHeight}px` }}>
+      <img
+        src="/elv.png"
+        className="elevator"
+        style={{ bottom: `${pxPosition}px` }}
+        alt={`Elevator ${elevatorId}`}
+      />
+    </div>
   );
 };

@@ -1,0 +1,60 @@
+/* Floor container styles */
+.floor {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 200px;
+    height: 103px; /* 110px - 7px for black line */
+}
+
+/* Floor button styles */
+.floor-button {
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.floor-button.calling {
+    border: 3px solid #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Timer display styles */
+.floor-timer {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #1f2937;
+    color: #10b981;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 60px;
+    text-align: center;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Black line separator */
+.blackline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 7px;
+    background-color: #000000;
+}

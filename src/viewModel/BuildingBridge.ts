@@ -8,15 +8,37 @@ export class BuildingBridge {
         return Math.round(logicalPosition * BuildingBridge.FLOOR_PX_HEIGHT);
     }
     
-    protected static dingSound = new Audio("/ding.mp3");
+    // Create multiple audio instances to handle concurrent sounds
+    protected static dingSounds: HTMLAudioElement[] = [];
+    protected static currentSoundIndex = 0;
+    
+    static initializeSounds() {
+        // Create 5 audio instances for concurrent playback
+        for (let i = 0; i < 5; i++) {
+            const audio = new Audio("/ding.mp3");
+            audio.preload = 'auto';
+            BuildingBridge.dingSounds.push(audio);
+        }
+    }
+    
     protected static playDingSound = () => { 
-        BuildingBridge.dingSound.play().catch(e => console.error("error in play ding:", e));
+        if (BuildingBridge.dingSounds.length === 0) {
+            BuildingBridge.initializeSounds();
+        }
+        
+        // Use round-robin to play different instances
+        const audio = BuildingBridge.dingSounds[BuildingBridge.currentSoundIndex];
+        BuildingBridge.currentSoundIndex = (BuildingBridge.currentSoundIndex + 1) % BuildingBridge.dingSounds.length;
+        
+        // Clone and play to handle overlapping sounds
+        audio.cloneNode(true).play().catch(e => console.error("error in play ding:", e));
     }
 
     readonly buildingModel: Building;
     private readonly getStoreState: () => any;
     private readonly setStoreState: (partial: any) => void;
     private eventsEnabled: boolean = true;
+    private estimateTimeInterval: number | null = null;
     
     constructor(buildingModel: Building, getState: () => any, setState: (partial: any) => void, disableEvents: boolean = false) {
         this.buildingModel = buildingModel;
@@ -24,7 +46,13 @@ export class BuildingBridge {
         this.setStoreState = setState;
         this.eventsEnabled = !disableEvents;
         
+        // Initialize sounds on first bridge creation
+        if (BuildingBridge.dingSounds.length === 0) {
+            BuildingBridge.initializeSounds();
+        }
+        
         this.subscribeToModelEvents();
+        this.startEstimateTimeUpdater();
     }
 
     get buildingId(){
@@ -77,6 +105,12 @@ export class BuildingBridge {
                 this.handleElevatorRemove(elevatorId);
             }
         });
+        
+        this.buildingModel.onElevatorEstimateTimeUpdate((elevatorId) => {
+            if (this.eventsEnabled) {
+                this.handleElevatorEstimateTimeUpdate(elevatorId);
+            }
+        });
     }
 
     private handleElevatorMove(elevatorId: number, logicalPosition: number) {
@@ -121,7 +155,8 @@ export class BuildingBridge {
             const updatedFloors = [...building.floors];
             updatedFloors[floorIndex] = {
                 ...updatedFloors[floorIndex], 
-                isCalling: false
+                isCalling: false,
+                estimateTime: 0
             };
             
             return {
@@ -218,6 +253,36 @@ export class BuildingBridge {
         });
     }
 
+    private handleElevatorEstimateTimeUpdate(elevatorId: number) {
+        console.log(`[BuildingBridge ${this.buildingId}] Handling estimate time update for elevator ${elevatorId}`);
+        
+        // Update all floors' estimate times
+        this.setStoreState((state: any) => {
+            const building = state.buildings[this.buildingId];
+            if (!building) return state;
+            
+            const updatedFloors = building.floors.map((floor: any) => {
+                const modelFloor = this.buildingModel.getFloorByNumber(floor.id);
+                if (!modelFloor || !modelFloor.isCallingToElevator) return floor;
+                
+                return {
+                    ...floor,
+                    estimateTime: modelFloor.estimatedWaitTimeSeconds
+                };
+            });
+            
+            return {
+                buildings: {
+                    ...state.buildings,
+                    [this.buildingId]: {
+                        ...building,
+                        floors: updatedFloors
+                    }
+                }
+            };
+        });
+    }
+
     addFloor() {
         this.buildingModel.addFloor();
     }
@@ -270,11 +335,63 @@ export class BuildingBridge {
     }
 
     initialSync() {
+        console.log(`[BuildingBridge ${this.buildingId}] Starting initial sync`);
         this.syncFloors();
         this.syncElevators();
+        console.log(`[BuildingBridge ${this.buildingId}] Initial sync completed`);
+    }
+
+    private startEstimateTimeUpdater() {
+        // Update estimate times every 100ms
+        this.estimateTimeInterval = setInterval(() => {
+            if (!this.eventsEnabled) return;
+            
+            this.setStoreState((state: any) => {
+                const building = state.buildings[this.buildingId];
+                if (!building) return state;
+                
+                let hasChanges = false;
+                const updatedFloors = building.floors.map((floor: any) => {
+                    const modelFloor = this.buildingModel.getFloorByNumber(floor.id);
+                    if (!modelFloor || !modelFloor.isCallingToElevator) {
+                        if (floor.estimateTime > 0) {
+                            hasChanges = true;
+                            return { ...floor, estimateTime: 0 };
+                        }
+                        return floor;
+                    }
+                    
+                    const newEstimateTime = Math.max(0, modelFloor.estimatedWaitTimeSeconds);
+                    if (Math.abs(floor.estimateTime - newEstimateTime) > 0.01) {
+                        hasChanges = true;
+                        return {
+                            ...floor,
+                            estimateTime: newEstimateTime
+                        };
+                    }
+                    return floor;
+                });
+                
+                if (!hasChanges) return state;
+                
+                return {
+                    buildings: {
+                        ...state.buildings,
+                        [this.buildingId]: {
+                            ...building,
+                            floors: updatedFloors
+                        }
+                    }
+                };
+            });
+        }, 100);
     }
 
     destroy() {
+        if (this.estimateTimeInterval !== null) {
+            clearInterval(this.estimateTimeInterval);
+            this.estimateTimeInterval = null;
+        }
         this.buildingModel.removeAllListeners();
     }
 }

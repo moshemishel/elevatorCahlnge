@@ -13,6 +13,7 @@ export const buildingConstants = {
   FLOOR_PX_HEIGHT: 110,
   // Using shared constant as single source of truth
   DEFAULT_FLOORS_COUNT: SHARED_BUILDING_CONSTANTS.INITIAL_TOTAL_FLOORS,
+  MIN_ELEVATORS: SHARED_BUILDING_CONSTANTS.MIN_ELEVATORS,
 } as const; 
 
 export const neighborhoodConstants = {
