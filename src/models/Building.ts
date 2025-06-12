@@ -218,28 +218,42 @@ export class Building extends BaseEntity {
         };
     }
 
-    dispatchElevatorTo(floorNumber: number): number {
-        console.log(`[Building ${this.id}] Dispatching elevator to floor ${floorNumber}`);
-        
-        // Check if elevator is already at this floor and not operating
-        const idleElevatorAtFloor = this.elevators.find(
-            elevator => elevator.currentFloor === floorNumber && !elevator.isOperating
-        );
-
-        if (idleElevatorAtFloor) {
-            console.log(`[Building ${this.id}] Found idle elevator ${idleElevatorAtFloor.id} already at floor ${floorNumber}`);
-            return 0;
-        }
-
-         // Find the most efficient elevator for this request
-        const { bestElevator, waitTimeSeconds } = this.findMostEfficientElevator(floorNumber);
-        console.log(`[Building ${this.id}] Selected elevator ${bestElevator.id} for floor ${floorNumber}, estimated wait: ${waitTimeSeconds}s`);
-
-        // Add floor to the best elevator's queue
-        bestElevator.addRequest(floorNumber);
-
-        return waitTimeSeconds;
+   dispatchElevatorTo(floorNumber: number): number {
+    console.log(`[Building ${this.id}] Dispatching elevator to floor ${floorNumber}`);
+    
+    const floor = this.getFloorByNumber(floorNumber);
+    if (!floor) {
+        console.warn(`[Building ${this.id}] Floor ${floorNumber} not found`);
+        return -1;
     }
+    
+    // בדוק אם יש מעלית בקומה במצב boarding
+    if (floor.elevatorBoardingState === 'boarding') {
+        console.log(`[Building ${this.id}] Floor ${floorNumber} has elevator in boarding state - joining existing elevator`);
+        return 0; // אין זמן המתנה - פשוט הצטרף
+    }
+    
+    // בדוק אם יש מעלית בקומה (לא משנה המצב)
+    const elevatorAtFloor = this.elevators.find(
+        elevator => Math.floor(elevator.currentFloor) === floorNumber
+    );
+
+    if (elevatorAtFloor) {
+        console.log(`[Building ${this.id}] Found elevator ${elevatorAtFloor.id} already at floor ${floorNumber}`);
+        
+        if (!elevatorAtFloor.queue.getAllRequests().includes(floorNumber)) {
+            elevatorAtFloor.addRequest(floorNumber);
+        }
+        
+        return 0;
+    }
+        // המשך הלוגיקה הרגילה
+    const { bestElevator, waitTimeSeconds } = this.findMostEfficientElevator(floorNumber);
+    console.log(`[Building ${this.id}] Selected elevator ${bestElevator.id} for floor ${floorNumber}, estimated wait: ${waitTimeSeconds}s`);
+
+    bestElevator.addRequest(floorNumber);
+
+    return waitTimeSeconds;
 
     private findMostEfficientElevator(targetFloor: number) {
         console.log(`[Building ${this.id}] Finding most efficient elevator for floor ${targetFloor}`);

@@ -102,4 +102,23 @@ export class Floor extends BaseEntity {
         console.log(`[Floor ${this.floorNumber}] Event callback registered`);
         this.onElevatorArrivedCallback = onElevatorArrived;
     }
+
+    private startBoardingTimer(): void {
+    // חישוב סף האזהרה בהתבסס על הזמן הנותר
+    const warningTime = elevatorConstants.WARNING_TIME_SECONDS;
+    
+    this.#boardingTimerInterval = setInterval(() => {
+        this.#boardingTimeRemaining -= 0.1;
+        
+        if (this.#boardingTimeRemaining <= 0) {
+            // הזמן נגמר
+            console.log(`[Floor ${this.floorNumber}] Boarding time ended for elevator ${this.#elevatorAtFloorId}`);
+            this.endBoarding();
+        } else if (this.#boardingTimeRemaining <= warningTime && this.#elevatorBoardingState === 'boarding') {
+            // מעבר למצב אזהרה
+            console.log(`[Floor ${this.floorNumber}] Entering warning state, ${this.#boardingTimeRemaining.toFixed(1)}s remaining`);
+            this.#elevatorBoardingState = 'warning';
+        }
+    }, 100);
+}
 }

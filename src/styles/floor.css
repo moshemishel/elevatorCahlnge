@@ -58,3 +58,51 @@
     100% { opacity: 1; }
 }
 
+
+.floor-button.calling {
+    color: green !important;
+    border: 3px solid #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+/* מצב boarding - כתום */
+.floor-button.boarding {
+    color: #f97316 !important; /* כתום */
+    border: 3px solid #f97316 !important;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+}
+
+/* מצב warning - אדום מהבהב */
+.floor-button.warning {
+    color: #dc2626 !important; /* אדום */
+    border: 3px solid #dc2626 !important;
+    animation: warning-flash 0.2s ease-in-out infinite;
+}
+
+@keyframes warning-flash {
+    0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.6);
+    }
+    50% { 
+        opacity: 0.5;
+        box-shadow: 0 0 5px rgba(220, 38, 38, 0.3);
+    }
+}
+
+/* טיימר במצב boarding - כתום */
+.floor-timer.boarding {
+    background-color: #ea580c;
+    color: #fff7ed;
+    border: 1px solid #c2410c;
+}
+
+/* טיימר במצב warning - אדום מהבהב */
+.floor-timer.warning {
+    background-color: #dc2626;
+    color: #fef2f2;
+    border: 1px solid #991b1b;
+    animation: warning-flash 0.2s ease-in-out infinite;
+}
+
+
