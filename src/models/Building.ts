@@ -218,7 +218,7 @@ export class Building extends BaseEntity {
         };
     }
 
-   dispatchElevatorTo(floorNumber: number): number {
+    dispatchElevatorTo(floorNumber: number): number {
     console.log(`[Building ${this.id}] Dispatching elevator to floor ${floorNumber}`);
     
     const floor = this.getFloorByNumber(floorNumber);
@@ -227,13 +227,13 @@ export class Building extends BaseEntity {
         return -1;
     }
     
-    // בדוק אם יש מעלית בקומה במצב boarding
+    // Check if there's an elevator at floor in boarding state
     if (floor.elevatorBoardingState === 'boarding') {
         console.log(`[Building ${this.id}] Floor ${floorNumber} has elevator in boarding state - joining existing elevator`);
-        return 0; // אין זמן המתנה - פשוט הצטרף
+        return 0; // No wait time - just join
     }
     
-    // בדוק אם יש מעלית בקומה (לא משנה המצב)
+    // Check if any elevator is already at this floor
     const elevatorAtFloor = this.elevators.find(
         elevator => Math.floor(elevator.currentFloor) === floorNumber
     );
@@ -241,19 +241,24 @@ export class Building extends BaseEntity {
     if (elevatorAtFloor) {
         console.log(`[Building ${this.id}] Found elevator ${elevatorAtFloor.id} already at floor ${floorNumber}`);
         
+        // Add to queue if not already there
         if (!elevatorAtFloor.queue.getAllRequests().includes(floorNumber)) {
             elevatorAtFloor.addRequest(floorNumber);
         }
         
-        return 0;
+        return 0; // Wait time is 0
     }
-        // המשך הלוגיקה הרגילה
+
+    // Continue with normal logic
     const { bestElevator, waitTimeSeconds } = this.findMostEfficientElevator(floorNumber);
     console.log(`[Building ${this.id}] Selected elevator ${bestElevator.id} for floor ${floorNumber}, estimated wait: ${waitTimeSeconds}s`);
 
     bestElevator.addRequest(floorNumber);
 
     return waitTimeSeconds;
+}
+
+
 
     private findMostEfficientElevator(targetFloor: number) {
         console.log(`[Building ${this.id}] Finding most efficient elevator for floor ${targetFloor}`);

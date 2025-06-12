@@ -100,6 +100,13 @@ export class ElevatorMovementManger {
         targetFloor: number
     ): number {
         const currentFloor = elevator.currentFloor;
+        
+        // Special check: if elevator is already at target floor
+        if (Math.floor(currentFloor) === targetFloor) {
+            console.log(`[Elevator ${elevator.id}] Already at floor ${targetFloor} - returning 0 wait time`);
+            return 0; // Always 0, even if elevator is "busy" with doors open
+        }
+        
         const queueArray = elevator.queue.getAllRequests();
         let totalTime = 0;
 
