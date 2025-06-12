@@ -157,52 +157,54 @@ export class BuildingSystemManager {
     }
 
     callElevatorToFloor(buildingId: number, floorNumber: number): boolean {
-        const building = this.buildings.get(buildingId);
-        
-        if (!building) {
-            console.warn(`Building ${buildingId} not found`);
-            return false;
-        }
-        
-        const floor = building.getFloorByNumber(floorNumber);
-        if (!floor) {
-            console.warn(`Floor ${floorNumber} not found in building ${buildingId}`);
-            return false;
-        }
-        
-        // Call elevator through the floor
-        const success = floor.callElevator();
-        
-        if (success) {
-            // Update the floor calling status in store
-            this.setStoreState((state: any) => {
-                const storeBuilding = state.buildings[buildingId];
-                if (!storeBuilding) return state;
-                
-                const floorIndex = storeBuilding.floors.findIndex((f: any) => f.id === floorNumber);
-                if (floorIndex === -1) return state;
-                
-                const updatedFloors = [...storeBuilding.floors];
-                updatedFloors[floorIndex] = {
-                    ...updatedFloors[floorIndex],
-                    isCalling: true,
-                    estimateTime: floor.estimatedWaitTimeSeconds
-                };
-                
-                return {
-                    buildings: {
-                        ...state.buildings,
-                        [buildingId]: {
-                            ...storeBuilding,
-                            floors: updatedFloors
-                        }
-                    }
-                };
-            });
-        }
-        
-        return success;
+    const building = this.buildings.get(buildingId);
+    
+    if (!building) {
+        console.warn(`Building ${buildingId} not found`);
+        return false;
     }
+    
+    const floor = building.getFloorByNumber(floorNumber);
+    if (!floor) {
+        console.warn(`Floor ${floorNumber} not found in building ${buildingId}`);
+        return false;
+    }
+    
+    // Call elevator through the floor
+    const success = floor.callElevator();
+    
+    if (success) {
+        // Update the floor calling status in store
+        this.setStoreState((state: any) => {
+            const storeBuilding = state.buildings[buildingId];
+            if (!storeBuilding) return state;
+            
+            const floorIndex = storeBuilding.floors.findIndex((f: any) => f.id === floorNumber);
+            if (floorIndex === -1) return state;
+            
+            const updatedFloors = [...storeBuilding.floors];
+            updatedFloors[floorIndex] = {
+                ...updatedFloors[floorIndex],
+                isCalling: true,
+                estimateTime: floor.estimatedWaitTimeSeconds,
+                boardingState: floor.elevatorBoardingState || 'none', // Add this
+                boardingTimeRemaining: floor.boardingTimeRemaining || 0 // Add this
+            };
+            
+            return {
+                buildings: {
+                    ...state.buildings,
+                    [buildingId]: {
+                        ...storeBuilding,
+                        floors: updatedFloors
+                    }
+                }
+            };
+        });
+    }
+    
+    return success;
+}
 
     // Add floor to a specific building
     addFloorToBuilding(buildingId: number): boolean {

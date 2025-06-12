@@ -9,6 +9,8 @@ export interface FloorsDisplayData {
     id: number;
     isCalling: boolean;
     estimateTime: number;
+    boardingState?: 'none' | 'boarding' | 'warning'; // Add this line
+    boardingTimeRemaining?: number; // Add this line
 }
 
 export interface BuildingDisplayData {

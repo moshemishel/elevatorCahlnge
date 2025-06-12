@@ -191,35 +191,34 @@ export class BuildingBridge {
   private handleFloorAdded() {
     const floors = this.buildingModel.floors;
     const newFloor = floors[floors.length - 1];
-
+    
     // Debug log for estimate time
     console.log(`[BuildingBridge] Floor added - estimate time:`, {
-      floorId: newFloor.id,
-      estimateTime: newFloor.estimatedWaitTimeSeconds,
-      isNaN: isNaN(newFloor.estimatedWaitTimeSeconds),
-      isUndefined: newFloor.estimatedWaitTimeSeconds === undefined,
+        floorId: newFloor.id,
+        estimateTime: newFloor.estimatedWaitTimeSeconds,
+        isNaN: isNaN(newFloor.estimatedWaitTimeSeconds),
+        isUndefined: newFloor.estimatedWaitTimeSeconds === undefined
     });
-
+    
     this.setStoreState((state: any) => {
-      const building = state.buildings[this.buildingId];
-      if (!building) return state;
-
-      return {
-        buildings: {
-          ...state.buildings,
-          [this.buildingId]: {
-            ...building,
-            floors: [
-              ...building.floors,
-              {
-                id: newFloor.id,
-                isCalling: newFloor.isCallingToElevator,
-                estimateTime: newFloor.estimatedWaitTimeSeconds,
-              },
-            ],
-          },
-        },
-      };
+        const building = state.buildings[this.buildingId];
+        if (!building) return state;
+        
+        return {
+            buildings: {
+                ...state.buildings,
+                [this.buildingId]: {
+                    ...building,
+                    floors: [...building.floors, {
+                        id: newFloor.id,
+                        isCalling: newFloor.isCallingToElevator,
+                        estimateTime: newFloor.estimatedWaitTimeSeconds,
+                        boardingState: newFloor.elevatorBoardingState || 'none', // Add this
+                        boardingTimeRemaining: newFloor.boardingTimeRemaining || 0 // Add this
+                    }]
+                }
+            }
+        };
     });
   }
 

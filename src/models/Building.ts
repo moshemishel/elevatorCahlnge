@@ -1,5 +1,5 @@
 import { BaseEntity, Elevator, Floor, createBuildingFloor, createBuildingElevator} from ".";
-import { buildingConstants } from '../constants';
+import { buildingConstants, elevatorConstants } from '../constants';
 
 export class Building extends BaseEntity {
     protected static readonly INITIAL_TOTAL_FLOORS = buildingConstants.INITIAL_TOTAL_FLOORS;
@@ -371,21 +371,26 @@ export class Building extends BaseEntity {
     }
 
     // Helper method to handle elevator arrival and notify floors
-    private handleElevatorArrival(floorNumber: number): void {
-        console.log(`[Building ${this.id}] Handling elevator arrival at floor ${floorNumber}`);
+   private handleElevatorArrival(elevatorId: number, floorNumber: number): void {
+    console.log(`[Building ${this.id}] Handling elevator ${elevatorId} arrival at floor ${floorNumber}`);
+    
+    // Find the floor and trigger its elevator arrival
+    const floor = this.getFloorByNumber(floorNumber);
+    if (floor && floor.isCallingToElevator) {
+        console.log(`[Building ${this.id}] Floor ${floorNumber} was waiting for elevator - triggering arrival`);
+        floor.triggerElevatorArrival?.();
         
-        // Find the floor and trigger its elevator arrival
-        const floor = this.getFloorByNumber(floorNumber);
-        if (floor && floor.isCallingToElevator) {
-            console.log(`[Building ${this.id}] Floor ${floorNumber} was waiting for elevator - triggering arrival`);
-            floor.triggerElevatorArrival?.();
-        } else if (floor) {
-            console.log(`[Building ${this.id}] Floor ${floorNumber} was not waiting for elevator`);
-        } else {
-            console.warn(`[Building ${this.id}] Floor ${floorNumber} not found!`);
-        }
-        
-        // Notify building-level listeners
-        this.notifyElevatorArrival(floorNumber);
+        // Start boarding state with stop time
+        const boardingTime = elevatorConstants.SECONDS_TO_STOP_AT_FLOOR || 2;
+        console.log(`[Building ${this.id}] Starting boarding state at floor ${floorNumber} for ${boardingTime}s`);
+        floor.startElevatorBoarding?.(elevatorId, boardingTime);
+    } else if (floor) {
+        console.log(`[Building ${this.id}] Floor ${floorNumber} was not waiting for elevator`);
+    } else {
+        console.warn(`[Building ${this.id}] Floor ${floorNumber} not found!`);
     }
+    
+    // Notify building-level listeners
+    this.notifyElevatorArrival(floorNumber);
+}
 }
