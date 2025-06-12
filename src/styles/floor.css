@@ -6,9 +6,16 @@
     justify-content: center;
     width: 100%;
     min-width: 200px;
-    height: 103px; /* 110px - 7px for black line */
+    height: 103px; 
 }
 
+
+/* Black line separator */
+.blackline {
+    width: 100%;
+    height: 7px;
+    background-color: #000000;
+}
 /* Floor button styles */
 .floor-button {
     position: relative;
@@ -51,12 +58,3 @@
     100% { opacity: 1; }
 }
 
-/* Black line separator */
-.blackline {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 7px;
-    background-color: #000000;
-}

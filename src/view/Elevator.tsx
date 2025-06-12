@@ -1,5 +1,6 @@
 import { useElevatorPosition } from "../viewModel";
 import '../styles/elevator.css';
+import { buildingViewConstants } from "../constants";
 
 interface ElevatorComponentProps {
   buildingId: number;
@@ -11,7 +12,7 @@ export const ElevatorComponent = ({ buildingId, elevatorId, totalFloors }: Eleva
   const pxPosition = useElevatorPosition(buildingId, elevatorId);
   
   // Calculate the total height of the elevator shaft based on number of floors
-  const shaftHeight = totalFloors * 110; // 110px per floor
+  const shaftHeight = totalFloors * buildingViewConstants.FLOOR_PX_HEIGHT; // 110px per floor
   
   return (
     <div className="elevator-shaft" style={{ height: `${shaftHeight}px` }}>

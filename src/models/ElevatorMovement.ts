@@ -7,6 +7,7 @@ export class ElevatorMovementManger {
     protected static readonly SECONDS_TO_STOP_AT_FLOOR =
         elevatorConstants.SECONDS_TO_STOP_AT_FLOOR;
 
+    private static readonly UPDATE_INTERVAL_MS = 100;
     private static getTimeToMoveBetweenFloors(
         fromFloor: number,
         toFloor: number

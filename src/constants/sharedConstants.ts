@@ -8,6 +8,9 @@ export const SHARED_BUILDING_CONSTANTS = {
   MAX_ELEVATORS: 5,
   MIN_FLOORS: 2,
   MAX_FLOORS: 20,
+  
+  // Time calculation thresholds
+  ESTIMATE_TIME_UPDATE_THRESHOLD: 0.05, 
 } as const;
 
 export const SHARED_ELEVATOR_CONSTANTS = {
